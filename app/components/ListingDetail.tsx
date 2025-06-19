@@ -9,11 +9,23 @@ import { AuthContext } from "../context/AuthContext";
 import api from "@/app/lib/api";
 import { loadStripe } from "@stripe/stripe-js";
 import Navbar from "./Navbar";
+import Image from "next/image";
 
-export default function ListingDetail({ listing }: { listing: any }) {
+interface Listing {
+  _id: string;
+  title: string;
+  description: string;
+  location: string;
+  price: number;
+  image?: string;
+  images?: string[];
+}
+
+export default function ListingDetail({ listing }: { listing: Listing }) {
   const { token } = useContext(AuthContext);
   const stripePromise = loadStripe("pk_test_51RZWyOQsSTQ00jF40oIkQn8TQE2ZclpNhn1CW7NeYspd8YFGmWzA4xttqQ2nYBJIPS79K24zMx35k0YjzY64emV400DiWPWV7W");
 
+  const defaultImage = listing.images?.[0] || listing.image || "https://placehold.co/600x400";
   const [bookingRange, setBookingRange] = useState<Range[]>([
     {
       startDate: new Date(),
@@ -21,10 +33,9 @@ export default function ListingDetail({ listing }: { listing: any }) {
       key: "selection",
     },
   ]);
+
   const [message, setMessage] = useState("");
-  const [selectedImage, setSelectedImage] = useState<string>(
-    listing.images?.[0] || listing.image || "https://placehold.co/600x400"
-  );
+  const [selectedImage, setSelectedImage] = useState<string>(defaultImage);
 
   const handleBooking = async () => {
     const range = bookingRange[0];
@@ -69,15 +80,19 @@ export default function ListingDetail({ listing }: { listing: any }) {
       <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Image Section */}
         <div>
-          <img
+          <Image
             src={selectedImage}
             alt={listing.title}
+            width={800}
+            height={500}
             className="rounded-2xl w-full h-[400px] object-cover shadow mb-4"
           />
           <div className="flex gap-2 overflow-x-auto">
-            {(listing.images || []).map((img: string, i: number) => (
-              <img
-                key={i}
+            {(listing.images || []).map((img, i) => (
+              <Image
+                key={img + i}
+                width={120}
+                height={80}
                 src={img}
                 alt={`Image ${i + 1}`}
                 onClick={() => setSelectedImage(img)}
@@ -103,6 +118,7 @@ export default function ListingDetail({ listing }: { listing: any }) {
           <div>
             <h3 className="text-md font-semibold mb-2">Select Booking Dates:</h3>
             <DateRange
+              minDate={new Date()}
               editableDateInputs={true}
               onChange={(item) => setBookingRange([item.selection])}
               moveRangeOnFirstSelection={false}

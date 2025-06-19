@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useContext, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "../context/AuthContext";
 import api from "../lib/api";
@@ -12,12 +12,12 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const res = await api.post("/login", form);
@@ -41,6 +41,7 @@ export default function LoginPage() {
             name="email"
             placeholder="Email"
             onChange={handleChange}
+            value={form.email}
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
             required
           />
@@ -49,6 +50,7 @@ export default function LoginPage() {
             name="password"
             placeholder="Password"
             onChange={handleChange}
+            value={form.password}
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
             required
           />
@@ -62,7 +64,7 @@ export default function LoginPage() {
         </form>
 
         <p className="text-sm text-center mt-6 text-gray-600">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/register" className="text-rose-500 font-medium hover:underline">
             Sign up
           </Link>

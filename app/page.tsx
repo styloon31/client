@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import api from "./lib/api";
 import ListingCard from "./components/ListingCard";
 import Navbar from "./components/Navbar";
+import { Listing } from "./types/listings";
 
 export default function HomePage() {
-  const [listings, setListings] = useState([]);
+  const [listings, setListings] = useState<Listing[]>([]);
   const [location, setLocation] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
   const fetchListings = async () => {
     try {
-      const res = await api.get("/listings", {
+      const res = await api.get<Listing[]>("/listings", {
         params: {
           location,
           minPrice,
@@ -75,11 +76,11 @@ export default function HomePage() {
 
         {/* Listings */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {listings.map((listing: any) => (
+          {listings.map((listing) => (
             <ListingCard
               key={listing._id}
               {...listing}
-              image={listing.image || listing.images?.[0]}
+              image={listing.image || listing.images?.[0] || "/placeholder.jpg"}
             />
           ))}
         </div>

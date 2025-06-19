@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useContext, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "../context/AuthContext";
 import api from "../lib/api";
@@ -9,15 +9,23 @@ import Link from "next/link";
 export default function RegisterPage() {
   const { login } = useContext(AuthContext);
   const router = useRouter();
-  const [form, setForm] = useState({ name: "", email: "", password: "", isHost: false });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    isHost: false,
+  });
   const [error, setError] = useState("");
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const res = await api.post("/register", form);
